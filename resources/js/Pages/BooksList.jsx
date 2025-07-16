@@ -235,32 +235,36 @@ export default function BooksList({ books, filters, categories = [] }) {
                                     className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-12"
                                 >
                                     {books.data.map((book) => (
-                                        <BookCard
-                                            key={book.id}
-                                            book={{
-                                                id: book.id,
-                                                title: book.title,
-                                                author: book.author,
-                                                cover: book.image
-                                                    ? `/storage/${book.image}`
-                                                    : "https://images.unsplash.com/photo-1589998059171-988d887df646?w=300&h=400&fit=crop",
-                                                rating:
-                                                    Math.round(
-                                                        book.average_rating
-                                                    ) || 0,
-                                                category: book.category,
-                                                available:
-                                                    book.available_count > 0,
-                                                available_count:
-                                                    book.available_count,
-                                                stock: book.stock,
-                                                description: book.description,
-                                                isbn: book.isbn,
-                                                is_recommended:
-                                                    book.is_recommended,
-                                            }}
-                                            onBorrow={handleBorrow}
-                                        />
+                                        <div className="transition-all duration-300 group">
+                                            <BookCard
+                                                key={book.id}
+                                                book={{
+                                                    id: book.id,
+                                                    title: book.title,
+                                                    author: book.author,
+                                                    cover: book.image
+                                                        ? `/storage/${book.image}`
+                                                        : "https://images.unsplash.com/photo-1589998059171-988d887df646?w=300&h=400&fit=crop",
+                                                    rating:
+                                                        Math.round(
+                                                            book.average_rating
+                                                        ) || 0,
+                                                    category: book.category,
+                                                    available:
+                                                        book.available_count >
+                                                        0,
+                                                    available_count:
+                                                        book.available_count,
+                                                    stock: book.stock,
+                                                    description:
+                                                        book.description,
+                                                    isbn: book.isbn,
+                                                    is_recommended:
+                                                        book.is_recommended,
+                                                }}
+                                                onBorrow={handleBorrow}
+                                            />
+                                        </div>
                                     ))}
                                 </div>
 

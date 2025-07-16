@@ -2,6 +2,7 @@ import { Head, router, useForm, usePage } from "@inertiajs/react";
 import { useState, useRef, useEffect } from "react";
 import AdminLayout from "../../Components/Admin/AdminLayout";
 import { Dialog } from "@headlessui/react";
+import { Plus } from "lucide-react";
 
 export default function BooksManagement({ books, categories }) {
     const { flash } = usePage().props;
@@ -170,33 +171,23 @@ export default function BooksManagement({ books, categories }) {
 
                 {/* Header Actions */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">
+                    <div className="w-full text-center">
+                        <h2 className="text-2xl font-bold text-gray-900 text-center">
                             Manajemen Buku
                         </h2>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 text-center">
                             Kelola koleksi buku perpustakaan ({books.total || 0}{" "}
                             buku)
                         </p>
                     </div>
                     <button
                         onClick={handleAddBook}
-                        className="bg-gradient-to-r from-[#6a1523] to-[#8a3837] text-white px-6 py-3 rounded-xl font-semibold hover:from-[#5a1220] hover:to-[#7a2837] transition-all duration-200 flex items-center"
+                        className="bg-gradient-to-r from-[#6a1523] to-[#8a3837] text-white px-6 py-2.5 rounded-xl font-semibold hover:from-[#5a1220] hover:to-[#7a2837] transition-all duration-200 flex items-center gap-2"
                     >
-                        <svg
-                            className="w-5 h-5 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 4v16m8-8H4"
-                            />
-                        </svg>
-                        Tambah Buku
+                        <Plus className="w-4 h-4" />
+                        <span className="text-sm whitespace-nowrap">
+                            Tambah Buku
+                        </span>
                     </button>
                 </div>
 
@@ -259,6 +250,9 @@ export default function BooksManagement({ books, categories }) {
                                 <th className="px-6 py-4 text-left font-semibold">
                                     Judul
                                 </th>
+                                <th className="px-6 py-4 text-center font-semibold">
+                                    Tahun
+                                </th>
                                 <th className="px-6 py-4 text-left font-semibold">
                                     Penulis
                                 </th>
@@ -311,16 +305,19 @@ export default function BooksManagement({ books, categories }) {
                                                 }}
                                             />
                                         </td>
-                                        <td className="px-6 py-3 font-bold text-gray-900 max-w-xs truncate flex items-center gap-1">
+                                        <td className="px-6 py-3 font-bold text-gray-900 max-w-xs truncate text-center relative">
                                             {book.title}
                                             {book.is_recommended && (
                                                 <span
                                                     title="Buku Rekomendasi"
-                                                    className="ml-1 text-yellow-500 text-lg"
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-yellow-500 text-lg"
                                                 >
                                                     ⭐
                                                 </span>
                                             )}
+                                        </td>
+                                        <td className="px-6 py-3 text-center">
+                                            {book.year || "-"}
                                         </td>
                                         <td className="px-6 py-3 text-gray-700 max-w-xs truncate">
                                             {book.author}
@@ -702,6 +699,28 @@ export default function BooksManagement({ books, categories }) {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Tahun Terbit
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1000"
+                                        max="9999"
+                                        value={addData.year || ""}
+                                        onChange={(e) =>
+                                            setAddData("year", e.target.value)
+                                        }
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6a1523] focus:border-transparent"
+                                        placeholder="Contoh: 2020"
+                                    />
+                                    {addErrors.year && (
+                                        <div className="text-red-500 text-xs mt-1">
+                                            {addErrors.year}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Deskripsi
                                     </label>
                                     <textarea
@@ -885,6 +904,28 @@ export default function BooksManagement({ books, categories }) {
                                     {editErrors.stock && (
                                         <div className="text-red-500 text-xs mt-1">
                                             {editErrors.stock}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Tahun Terbit
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1000"
+                                        max="9999"
+                                        value={editData.year || ""}
+                                        onChange={(e) =>
+                                            setEditData("year", e.target.value)
+                                        }
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6a1523] focus:border-transparent"
+                                        placeholder="Contoh: 2020"
+                                    />
+                                    {editErrors.year && (
+                                        <div className="text-red-500 text-xs mt-1">
+                                            {editErrors.year}
                                         </div>
                                     )}
                                 </div>

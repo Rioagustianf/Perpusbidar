@@ -250,62 +250,88 @@ export default function BorrowList({ borrowings, filters }) {
                                             <tbody className="divide-y divide-gray-200">
                                                 {borrowings.data.map(
                                                     (borrowing) => (
-                                                        <tr
-                                                            key={borrowing.id}
-                                                            className="hover:bg-gray-50"
-                                                        >
-                                                            <td className="px-6 py-4">
-                                                                <div>
-                                                                    <div className="text-sm font-medium text-gray-900">
-                                                                        {borrowing
-                                                                            .book
-                                                                            ?.title ||
-                                                                            "N/A"}
+                                                        <>
+                                                            <tr
+                                                                key={
+                                                                    borrowing.id
+                                                                }
+                                                                className="hover:bg-gray-50"
+                                                            >
+                                                                <td className="px-6 py-4">
+                                                                    <div>
+                                                                        <div className="text-sm font-medium text-gray-900">
+                                                                            {borrowing
+                                                                                .book
+                                                                                ?.title ||
+                                                                                "N/A"}
+                                                                        </div>
+                                                                        <div className="text-sm text-gray-500">
+                                                                            by{" "}
+                                                                            {borrowing
+                                                                                .book
+                                                                                ?.author ||
+                                                                                "N/A"}
+                                                                        </div>
                                                                     </div>
-                                                                    <div className="text-sm text-gray-500">
-                                                                        by{" "}
-                                                                        {borrowing
-                                                                            .book
-                                                                            ?.author ||
-                                                                            "N/A"}
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <div className="text-sm text-gray-900">
+                                                                        {formatDate(
+                                                                            borrowing.created_at
+                                                                        )}
                                                                     </div>
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                <div className="text-sm text-gray-900">
-                                                                    {formatDate(
-                                                                        borrowing.created_at
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <div className="text-sm text-gray-900">
+                                                                        {formatDate(
+                                                                            borrowing.borrow_date
+                                                                        )}
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <div className="text-sm text-gray-900">
+                                                                        {formatDate(
+                                                                            borrowing.return_date
+                                                                        )}
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    {getStatusBadge(
+                                                                        borrowing.status
                                                                     )}
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                <div className="text-sm text-gray-900">
-                                                                    {formatDate(
-                                                                        borrowing.borrow_date
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                <div className="text-sm text-gray-900">
-                                                                    {formatDate(
-                                                                        borrowing.return_date
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                {getStatusBadge(
-                                                                    borrowing.status
+                                                                </td>
+                                                                <td className="px-6 py-4">
+                                                                    <div className="text-sm text-gray-900">
+                                                                        {borrowing.fine >
+                                                                        0
+                                                                            ? `Rp ${borrowing.fine.toLocaleString()}`
+                                                                            : "-"}
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            {borrowing.status ===
+                                                                "rejected" &&
+                                                                borrowing.notes && (
+                                                                    <tr>
+                                                                        <td
+                                                                            colSpan={
+                                                                                6
+                                                                            }
+                                                                            className="px-6 pb-4 pt-0"
+                                                                        >
+                                                                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
+                                                                                <strong>
+                                                                                    Alasan
+                                                                                    Penolakan:
+                                                                                </strong>{" "}
+                                                                                {
+                                                                                    borrowing.notes
+                                                                                }
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
                                                                 )}
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                <div className="text-sm text-gray-900">
-                                                                    {borrowing.fine >
-                                                                    0
-                                                                        ? `Rp ${borrowing.fine.toLocaleString()}`
-                                                                        : "-"}
-                                                                </div>
-                                                            </td>
-                                                        </tr>
+                                                        </>
                                                     )
                                                 )}
                                             </tbody>

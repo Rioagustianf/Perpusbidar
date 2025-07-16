@@ -26,6 +26,7 @@ return new class extends Migration
             $table->decimal('average_rating', 3, 2)->default(0.00);
             $table->integer('total_ratings')->default(0);
             $table->enum('status', ['available', 'unavailable', 'maintenance'])->default('available');
+            $table->integer('year')->nullable()->after('category');
             $table->timestamps();
         });
     }

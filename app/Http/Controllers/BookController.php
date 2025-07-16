@@ -89,6 +89,25 @@ class BookController extends Controller
         $books = $query->paginate($request->get('per_page', 15));
         $categories = Category::orderBy('name')->get(['id', 'name']);
 
+        // Map agar field year selalu ada
+        $books->getCollection()->transform(function ($book) {
+            return [
+                'id' => $book->id,
+                'title' => $book->title,
+                'author' => $book->author,
+                'isbn' => $book->isbn,
+                'category' => $book->category,
+                'year' => $book->year,
+                'description' => $book->description,
+                'stock' => $book->stock,
+                'available_count' => $book->available_count,
+                'borrowed_count' => $book->borrowed_count,
+                'status' => $book->status,
+                'image' => $book->image,
+                'is_recommended' => $book->is_recommended,
+            ];
+        });
+
         return Inertia::render('Admin/BooksManagement', [
             'books' => $books,
             'filters' => $request->only(['search', 'category']),
@@ -114,6 +133,7 @@ class BookController extends Controller
             'author' => 'required|string|max:255',
             'isbn' => 'required|string|unique:books,isbn',
             'category' => 'required|string|max:100',
+            'year' => 'nullable|integer|min:1000|max:9999',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'stock' => 'required|integer|min:0',
@@ -124,7 +144,7 @@ class BookController extends Controller
         }
 
         $bookData = $request->only([
-            'title', 'author', 'isbn', 'category', 'description', 'stock'
+            'title', 'author', 'isbn', 'category', 'year', 'description', 'stock'
         ]);
 
         $bookData['available_count'] = $bookData['stock'];
@@ -185,6 +205,7 @@ class BookController extends Controller
             'author' => 'required|string|max:255',
             'isbn' => 'required|string|unique:books,isbn,' . $book->id,
             'category' => 'required|string|max:100',
+            'year' => 'nullable|integer|min:1000|max:9999',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'stock' => 'required|integer|min:0',
@@ -195,7 +216,7 @@ class BookController extends Controller
         }
 
         $bookData = $request->only([
-            'title', 'author', 'isbn', 'category', 'description', 'stock'
+            'title', 'author', 'isbn', 'category', 'year', 'description', 'stock'
         ]);
 
         // Update available count based on new stock

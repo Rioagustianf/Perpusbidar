@@ -165,6 +165,10 @@ export default function BorrowForm({ book_id = null }) {
                                                 {selectedBook.isbn}
                                             </p>
                                             <p className="text-gray-700 mb-1">
+                                                <strong>Tahun Terbit:</strong>{" "}
+                                                {selectedBook.year || "-"}
+                                            </p>
+                                            <p className="text-gray-700 mb-1">
                                                 <strong>Stok Tersedia:</strong>{" "}
                                                 {selectedBook.available_count}
                                             </p>
@@ -184,32 +188,34 @@ export default function BorrowForm({ book_id = null }) {
                                     {/* Left Column */}
                                     <div className="space-y-6">
                                         {/* Book Selection */}
-                                        <div>
-                                            <label className="block text-black text-lg font-semibold mb-3">
-                                                Pilih Buku
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={data.book_id}
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "book_id",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                                className="bg-white w-full px-4 py-4 rounded-2xl border-2 border-black focus:border-blue-500 focus:outline-none text-gray-800 text-lg"
-                                                placeholder="Masukkan ID buku"
-                                            />
-                                            {errors.book_id && (
-                                                <div className="text-red-500 text-sm mt-1">
-                                                    {errors.book_id}
-                                                </div>
-                                            )}
-                                        </div>
+                                        {(!book_id || book_id === "") && (
+                                            <div>
+                                                <label className="block text-black text-lg font-semibold mb-3">
+                                                    Pilih Buku
+                                                    <span className="text-red-500">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={data.book_id}
+                                                    onChange={(e) =>
+                                                        setData(
+                                                            "book_id",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    required
+                                                    className="bg-white w-full px-4 py-4 rounded-2xl border-2 border-black focus:border-blue-500 focus:outline-none text-gray-800 text-lg"
+                                                    placeholder="Masukkan ID buku"
+                                                />
+                                                {errors.book_id && (
+                                                    <div className="text-red-500 text-sm mt-1">
+                                                        {errors.book_id}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
 
                                         {/* Tanggal Peminjaman */}
                                         <div>
