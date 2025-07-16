@@ -50,10 +50,12 @@ class BookController extends Controller
         $query->orderBy($sortBy, $sortOrder);
 
         $books = $query->paginate($request->get('per_page', 15));
+        $categories = \App\Models\Category::orderBy('name')->get(['id', 'name']);
 
         return Inertia::render('BooksList', [
             'books' => $books,
             'filters' => $request->only(['search', 'category', 'available', 'rating']),
+            'categories' => $categories,
         ]);
     }
 

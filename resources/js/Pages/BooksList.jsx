@@ -5,7 +5,7 @@ import Footer from "../Components/Footer";
 import BookCard from "../Components/BookCard";
 import gsap from "gsap";
 
-export default function BooksList({ books, filters }) {
+export default function BooksList({ books, filters, categories = [] }) {
     const [searchTerm, setSearchTerm] = useState(filters.search || "");
     const [selectedFilter, setSelectedFilter] = useState(filters.rating || "");
     const [categoryFilter, setCategoryFilter] = useState(
@@ -174,15 +174,14 @@ export default function BooksList({ books, filters }) {
                                         <option value="all">
                                             Semua Kategori
                                         </option>
-                                        <option value="Teknologi">
-                                            Teknologi
-                                        </option>
-                                        <option value="Bisnis">Bisnis</option>
-                                        <option value="Sastra">Sastra</option>
-                                        <option value="Sains">Sains</option>
-                                        <option value="Sejarah">Sejarah</option>
-                                        <option value="Agama">Agama</option>
-                                        <option value="Lainnya">Lainnya</option>
+                                        {categories.map((cat) => (
+                                            <option
+                                                key={cat.id}
+                                                value={cat.name}
+                                            >
+                                                {cat.name}
+                                            </option>
+                                        ))}
                                     </select>
                                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                         <svg
