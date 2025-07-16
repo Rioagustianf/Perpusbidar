@@ -13,7 +13,10 @@ export default function BookCard({ book, onBorrow }) {
     };
 
     return (
-        <div className="bg-transparent rounded-lg shadow-lg overflow-visible hover:shadow-2xl h-full flex flex-col group-hover:-translate-y-2 group-hover:scale-105 group-hover:z-10 transition-all duration-300">
+        <div
+            className="bg-transparent rounded-lg shadow-lg overflow-visible hover:shadow-2xl h-full flex flex-col group-hover:-translate-y-2 group-hover:scale-105 group-hover:z-10 transition-all duration-300 cursor-pointer hover:bg-[#f5e7d6]/60"
+            onClick={() => onBorrow && onBorrow(book)}
+        >
             <div className="relative">
                 <img
                     src={
@@ -26,11 +29,17 @@ export default function BookCard({ book, onBorrow }) {
             </div>
 
             <div className="p-4 flex flex-col flex-grow">
-                <h3 className="font-bold text-white mb-2 text-lg leading-tight line-clamp-2 min-h-[3.5rem]">
+                <h3
+                    className="font-semibold text-white mb-1 text-base sm:text-lg leading-snug line-clamp-2 max-h-[2.8em] overflow-hidden break-words cursor-pointer px-0.5"
+                    title={book.title}
+                >
                     {book.title || "The Girl in Snow"}
                 </h3>
 
-                <p className="text-black text-sm mb-3">
+                <p
+                    className="text-black text-sm mb-3 truncate max-w-full cursor-pointer"
+                    title={book.author}
+                >
                     By : {book.author || "Sandra Lunata"}
                 </p>
 
@@ -38,13 +47,7 @@ export default function BookCard({ book, onBorrow }) {
                     {getStarRating(book.rating)}
                 </div>
 
-                <button
-                    onClick={() => onBorrow && onBorrow(book)}
-                    className="w-full bg-[#8a3837] hover:bg-[#bd8757] text-white py-2 px-4 rounded font-semibold transition-colors flex items-center justify-center space-x-2 mt-auto"
-                >
-                    <span>Pinjam</span>
-                    <span>📚</span>
-                </button>
+                {/* Hapus tombol Pinjam */}
             </div>
         </div>
     );
