@@ -53,16 +53,6 @@ export default function BooksManagement({ books, categories }) {
         _method: "PUT",
     });
 
-    const availableCategories = [
-        "Teknologi",
-        "Bisnis",
-        "Sastra",
-        "Sains",
-        "Sejarah",
-        "Agama",
-        "Lainnya",
-    ];
-
     const filteredBooks =
         books.data?.filter((book) => {
             const matchesSearch =
@@ -248,9 +238,9 @@ export default function BooksManagement({ books, categories }) {
                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#6a1523] focus:border-transparent"
                             >
                                 <option value="all">Semua Kategori</option>
-                                {availableCategories.map((category) => (
-                                    <option key={category} value={category}>
-                                        {category}
+                                {categories.map((cat) => (
+                                    <option key={cat.id} value={cat.name}>
+                                        {cat.name}
                                     </option>
                                 ))}
                             </select>
@@ -673,12 +663,12 @@ export default function BooksManagement({ books, categories }) {
                                         required
                                     >
                                         <option value="">Pilih Kategori</option>
-                                        {availableCategories.map((category) => (
+                                        {categories.map((cat) => (
                                             <option
-                                                key={category}
-                                                value={category}
+                                                key={cat.id}
+                                                value={cat.name}
                                             >
-                                                {category}
+                                                {cat.name}
                                             </option>
                                         ))}
                                     </select>
@@ -862,12 +852,12 @@ export default function BooksManagement({ books, categories }) {
                                         required
                                     >
                                         <option value="">Pilih Kategori</option>
-                                        {availableCategories.map((category) => (
+                                        {categories.map((cat) => (
                                             <option
-                                                key={category}
-                                                value={category}
+                                                key={cat.id}
+                                                value={cat.name}
                                             >
-                                                {category}
+                                                {cat.name}
                                             </option>
                                         ))}
                                     </select>

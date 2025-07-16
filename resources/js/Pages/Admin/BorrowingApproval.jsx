@@ -3,14 +3,14 @@ import { useState } from "react";
 import AdminLayout from "../../Components/Admin/AdminLayout";
 
 export default function BorrowingApproval() {
-    const { requests = { data: [] } } = usePage().props;
+    const { requests = [] } = usePage().props;
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("all");
     const [notification, setNotification] = useState(null);
     const [notificationType, setNotificationType] = useState("success");
     const [rejectingId, setRejectingId] = useState(null);
     const [rejectReason, setRejectReason] = useState("");
-    const borrowingRequests = requests.data;
+    const borrowingRequests = requests;
 
     const filteredRequests = borrowingRequests.filter((request) => {
         const matchesSearch =

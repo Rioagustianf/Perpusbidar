@@ -156,93 +156,51 @@ export default function AdminDashboard() {
                 {/* Recent Activities & Quick Actions */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Recent Activities */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-                        <div className="p-4 border-b border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-900">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 w-full max-w-2xl mx-auto">
+                        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-gray-900 tracking-wide">
                                 Aktivitas Terbaru
                             </h3>
                         </div>
-                        <div className="p-4">
-                            <div className="space-y-4">
-                                {recentActivities.map((activity) => (
-                                    <div
-                                        key={activity.id}
-                                        className="flex items-start space-x-3"
-                                    >
-                                        <div className="text-xl">
-                                            {getActivityIcon(activity.type)}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    {activity.user}
-                                                </p>
-                                                <span
-                                                    className={`px-2 py-1 text-xs font-medium rounded-full ${getActivityColor(
-                                                        activity.status
-                                                    )}`}
-                                                >
-                                                    {activity.status}
-                                                </span>
+                        <div className="p-4 max-h-96 overflow-y-auto">
+                            {recentActivities.length === 0 ? (
+                                <div className="text-gray-400 text-center py-8">
+                                    Belum ada aktivitas terbaru.
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {recentActivities.map((activity) => (
+                                        <div
+                                            key={activity.id}
+                                            className="flex items-start space-x-3"
+                                        >
+                                            <div className="text-xl flex-shrink-0">
+                                                {getActivityIcon(activity.type)}
                                             </div>
-                                            <p className="text-sm text-gray-600">
-                                                {activity.book}
-                                            </p>
-                                            <p className="text-xs text-gray-400">
-                                                {activity.time}
-                                            </p>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                                        {activity.user}
+                                                    </p>
+                                                    <span
+                                                        className={`px-2 py-1 text-xs font-medium rounded-full ${getActivityColor(
+                                                            activity.status
+                                                        )}`}
+                                                    >
+                                                        {activity.status}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-gray-600 truncate">
+                                                    {activity.book}
+                                                </p>
+                                                <p className="text-xs text-gray-400">
+                                                    {activity.time}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Quick Actions */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-                        <div className="p-4 border-b border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                                Aksi Cepat
-                            </h3>
-                        </div>
-                        <div className="p-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <button className="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-center transition-colors group">
-                                    <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
-                                        📚
-                                    </div>
-                                    <p className="text-sm font-medium text-blue-700">
-                                        Tambah Buku
-                                    </p>
-                                </button>
-
-                                <button className="p-4 bg-green-50 hover:bg-green-100 rounded-xl text-center transition-colors group">
-                                    <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
-                                        ✅
-                                    </div>
-                                    <p className="text-sm font-medium text-green-700">
-                                        Approve Peminjaman
-                                    </p>
-                                </button>
-
-                                <button className="p-4 bg-yellow-50 hover:bg-yellow-100 rounded-xl text-center transition-colors group">
-                                    <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
-                                        📤
-                                    </div>
-                                    <p className="text-sm font-medium text-yellow-700">
-                                        Proses Pengembalian
-                                    </p>
-                                </button>
-
-                                <button className="p-4 bg-purple-50 hover:bg-purple-100 rounded-xl text-center transition-colors group">
-                                    <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">
-                                        📈
-                                    </div>
-                                    <p className="text-sm font-medium text-purple-700">
-                                        Lihat Laporan
-                                    </p>
-                                </button>
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

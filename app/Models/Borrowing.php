@@ -87,14 +87,22 @@ class Borrowing extends Model
                $this->return_date < Carbon::now()->toDateString();
     }
 
-    // Calculate fine for overdue books
-    public function calculateFine($dailyFine = 1000)
+    // Calculate fine for overdue books and damage
+    public function calculateFine($actualReturnDate = null, $condition = 'baik')
     {
-        if ($this->isOverdue()) {
-            $overdueDays = Carbon::parse($this->return_date)->diffInDays(Carbon::now());
-            return $overdueDays * $dailyFine;
+        $fine = 0;
+        $actualReturn = $actualReturnDate ? Carbon::parse($actualReturnDate) : Carbon::now();
+        $due = Carbon::parse($this->return_date);
+        // Denda keterlambatan: 500 rupiah per hari keterlambatan
+        if ($actualReturn->gt($due)) {
+            $overdueDays = $due->diffInDays($actualReturn);
+            $fine += 500 * $overdueDays;
         }
-        return 0;
+        // Denda kerusakan: 250.000 jika kondisi != 'baik'
+        if (strtolower($condition) !== 'baik') {
+            $fine += 250000;
+        }
+        return $fine;
     }
 
     // Approve borrowing
@@ -113,11 +121,13 @@ class Borrowing extends Model
     // Return book
     public function returnBook($condition = 'baik')
     {
+        $actualReturnDate = Carbon::now()->toDateString();
+        $fine = $this->calculateFine($actualReturnDate, $condition);
         $this->update([
             'status' => 'returned',
-            'actual_return_date' => Carbon::now()->toDateString(),
+            'actual_return_date' => $actualReturnDate,
             'condition' => $condition,
-            'fine' => $this->calculateFine(),
+            'fine' => $fine,
         ]);
         $this->book->incrementStock();
     }

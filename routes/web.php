@@ -8,6 +8,7 @@ use App\Http\Controllers\BorrowingController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ExportController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\CategoryController;
 
 // Dashboard - Landing Page
 Route::get('/', function () {
@@ -117,4 +118,12 @@ Route::middleware(['auth.custom', 'admin'])->prefix('admin')->group(function () 
         ]);
     })->name('admin.reports');
     Route::get('/export/borrowings', [ExportController::class, 'exportBorrowings'])->name('admin.export.borrowings');
+    Route::get('/categories-management', function () {
+        return Inertia::render('Admin/CategoriesManagement');
+    })->name('admin.categories-management');
+});
+
+// Route kategori (hanya untuk admin)
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::resource('categories', CategoryController::class)->except(['create', 'edit', 'show']);
 });

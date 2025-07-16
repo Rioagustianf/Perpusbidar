@@ -1,10 +1,40 @@
 import BookCard from "./BookCard";
+import { useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
 
 export default function RecommendationSection({ books = [], onBorrow }) {
     const displayBooks = books;
+    const gridRef = useRef(null);
+    const sectionRef = useRef(null);
+
+    useEffect(() => {
+        if (gridRef.current && sectionRef.current) {
+            gsap.fromTo(
+                gridRef.current.children,
+                { opacity: 0, y: 40 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.7,
+                    stagger: 0.08,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: "top 80%",
+                        once: true,
+                    },
+                }
+            );
+        }
+    }, [displayBooks]);
 
     return (
-        <section className="bg-gradient-to-b from-[#6a1523] to-[#ffc987] py-16 relative overflow-hidden">
+        <section
+            ref={sectionRef}
+            className="bg-gradient-to-b from-[#6a1523] to-[#ffc987] py-16 relative overflow-hidden"
+        >
             <div className="max-w-7xl mx-auto px-6">
                 {/* Title with decorative lines */}
                 <div className="relative flex items-center justify-center mb-12">
@@ -13,18 +43,15 @@ export default function RecommendationSection({ books = [], onBorrow }) {
                         style={{ left: "-200px", width: "calc(50vw + 200px)" }}
                     >
                         <div className="h-2 bg-[#bd8757] rounded-r-full w-1/2"></div>
-
                         <div
                             className="h-2 bg-white rounded-r-full"
                             style={{ width: "60%" }}
                         ></div>
                     </div>
-
                     {/* Title */}
                     <h2 className="text-3xl lg:text-4xl font-bold text-white text-center px-8 relative z-10">
                         Rekomendasi Buku
                     </h2>
-
                     <div
                         className="absolute right-0 top-1/2 transform -translate-y-1/2 space-y-2"
                         style={{ right: "-200px", width: "calc(50vw + 200px)" }}
@@ -36,10 +63,12 @@ export default function RecommendationSection({ books = [], onBorrow }) {
                         ></div>
                     </div>
                 </div>
-
                 {/* Books Grid */}
                 {displayBooks.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div
+                        ref={gridRef}
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                    >
                         {displayBooks.map((book) => (
                             <BookCard
                                 key={book.id}

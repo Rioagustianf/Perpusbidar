@@ -134,9 +134,26 @@ class BorrowingController extends Controller
     public function pendingRequests()
     {
         $requests = Borrowing::with(['user', 'book'])
-                            ->pending()
-                            ->orderBy('created_at', 'asc')
-                            ->paginate(15);
+            ->pending()
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(function ($b) {
+                return [
+                    'id' => $b->id,
+                    'book_title' => $b->book->title ?? '-',
+                    'book_author' => $b->book->author ?? '-',
+                    'image' => $b->book && $b->book->image ? asset('storage/' . $b->book->image) : null,
+                    'user_name' => $b->user->name ?? '-',
+                    'user_nim' => $b->user->nim ?? '-',
+                    'user_phone' => $b->user->phone ?? '-',
+                    'status' => $b->status,
+                    'request_date' => $b->created_at,
+                    'borrow_date' => $b->borrow_date,
+                    'return_date' => $b->return_date,
+                    'notes' => $b->notes,
+                    'rejection_reason' => $b->status === 'rejected' ? $b->notes : null,
+                ];
+            });
 
         return Inertia::render('Admin/BorrowingApproval', [
             'requests' => $requests,

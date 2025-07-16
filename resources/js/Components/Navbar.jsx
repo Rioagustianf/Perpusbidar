@@ -1,6 +1,8 @@
 import { Link, usePage } from "@inertiajs/react";
 import { useState } from "react";
 
+import { ArrowRight } from "lucide-react";
+
 export default function Navbar({ activeTab = "Dashboard" }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { auth } = usePage().props;
@@ -55,37 +57,51 @@ export default function Navbar({ activeTab = "Dashboard" }) {
                     </div>
 
                     {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center space-x-8">
-                        {navItems.map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className={`text-sm font-medium transition-colors py-2 px-1 ${
-                                    item.active
-                                        ? "text-white border-b-2 border-white font-bold"
-                                        : "text-gray-700 hover:text-white hover:border-b-2 hover:border-white"
-                                }`}
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
-
-                        {/* Auth Section - Only show logout if logged in */}
-                        {auth?.user && (
-                            <div className="flex items-center space-x-4">
-                                <span className="text-sm text-gray-700">
+                    <div className="hidden md:flex w-full items-center justify-between ml-8">
+                        {/* Navigasi utama */}
+                        <div className="flex items-center gap-8">
+                            {navItems.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className={`text-sm font-medium transition-colors py-2 px-1 whitespace-nowrap ${
+                                        item.active
+                                            ? "text-white border-b-2 border-white font-bold"
+                                            : "text-gray-700 hover:text-white hover:border-b-2 hover:border-white"
+                                    }`}
+                                >
+                                    {item.name}
+                                </Link>
+                            ))}
+                        </div>
+                        {/* Area user kanan */}
+                        <div className="flex items-center gap-6 ml-8 whitespace-nowrap">
+                            {auth?.user?.role === "admin" && (
+                                <Link
+                                    href="/admin/dashboard"
+                                    className="flex items-center gap-1 text-sm font-medium text-[#6a1523] underline hover:text-[#8a3837] transition-colors whitespace-nowrap"
+                                    style={{ minWidth: "max-content" }}
+                                >
+                                    Kembali ke Admin
+                                    <ArrowRight className="w-4 h-4 ml-1" />
+                                </Link>
+                            )}
+                            {auth?.user && (
+                                <span className="text-sm text-gray-700 whitespace-nowrap">
                                     Hi, {auth.user.name}
                                 </span>
+                            )}
+                            {auth?.user && (
                                 <Link
                                     href="/logout"
                                     method="post"
                                     as="button"
-                                    className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                                    className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition-colors whitespace-nowrap"
                                 >
                                     Logout
                                 </Link>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     {/* Hamburger Button (Mobile/Tablet) */}
@@ -175,7 +191,7 @@ export default function Navbar({ activeTab = "Dashboard" }) {
                         </div>
 
                         {/* Menu Items */}
-                        <div className="py-4">
+                        <div className="py-4 flex flex-col gap-1">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.name}
@@ -190,13 +206,23 @@ export default function Navbar({ activeTab = "Dashboard" }) {
                                     {item.name}
                                 </Link>
                             ))}
-                        </div>
-
-                        {/* Auth Section Mobile - Only show if logged in */}
-                        {auth?.user && (
-                            <div className="px-6 py-4 border-t border-gray-200">
-                                <div className="space-y-3">
-                                    <div className="text-sm text-gray-700">
+                            {/* Tombol kembali ke admin jika user admin (mobile) */}
+                            {auth?.user?.role === "admin" && (
+                                <Link
+                                    href="/admin/dashboard"
+                                    className="flex items-center justify-center gap-1 mt-2 mx-6 text-base font-medium text-[#6a1523] underline hover:text-[#8a3837] text-center transition-colors whitespace-nowrap"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    style={{ minWidth: "max-content" }}
+                                >
+                                    Kembali ke Admin
+                                    <ArrowRight className="w-4 h-4 ml-1" />
+                                </Link>
+                            )}
+                            <div className="border-t border-gray-200 my-2" />
+                            {/* Auth Section Mobile - Only show if logged in */}
+                            {auth?.user && (
+                                <div className="px-6 py-4 flex flex-col gap-3">
+                                    <div className="text-sm text-gray-700 text-center">
                                         Hi, {auth.user.name}
                                     </div>
                                     <Link
@@ -209,8 +235,8 @@ export default function Navbar({ activeTab = "Dashboard" }) {
                                         Logout
                                     </Link>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         {/* Menu Footer */}
                         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gray-50 border-t">

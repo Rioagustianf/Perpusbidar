@@ -1,8 +1,9 @@
 import { Head, router, usePage } from "@inertiajs/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import BookCard from "../Components/BookCard";
+import gsap from "gsap";
 
 export default function BooksList({ books, filters }) {
     const [searchTerm, setSearchTerm] = useState(filters.search || "");
@@ -14,6 +15,25 @@ export default function BooksList({ books, filters }) {
         filters.available || false
     );
     const { flash } = usePage().props;
+
+    // GSAP animation ref
+    const gridRef = useRef(null);
+
+    useEffect(() => {
+        if (gridRef.current) {
+            gsap.fromTo(
+                gridRef.current.children,
+                { opacity: 0, y: 40 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.7,
+                    stagger: 0.08,
+                    ease: "power2.out",
+                }
+            );
+        }
+    }, [books.data]);
 
     // Debounce search to avoid too many requests
     useEffect(() => {
@@ -211,7 +231,10 @@ export default function BooksList({ books, filters }) {
                         {/* Books Grid */}
                         {books.data && books.data.length > 0 ? (
                             <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-12">
+                                <div
+                                    ref={gridRef}
+                                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-12"
+                                >
                                     {books.data.map((book) => (
                                         <BookCard
                                             key={book.id}

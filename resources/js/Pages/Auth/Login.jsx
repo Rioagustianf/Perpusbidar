@@ -20,8 +20,13 @@ export default function Login() {
         <>
             <Head title="Login - Perpustakaan Digital Bina Darma" />
 
-            <div className="min-h-screen bg-gradient-to-br from-[#ffc987] to-[#6a1523] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-md w-full space-y-8">
+            <div
+                className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative bg-cover bg-center"
+                style={{ backgroundImage: "url(/assets/bglogin.jpg)" }}
+            >
+                {/* Overlay agar form tetap jelas */}
+                <div className="absolute inset-0 bg-black/50 z-0" />
+                <div className="max-w-md w-full space-y-8 relative z-10">
                     {/* Header */}
                     <div className="text-center">
                         <img
@@ -231,23 +236,6 @@ export default function Login() {
                                 </Link>
                             </div>
                         </form>
-                    </div>
-
-                    {/* Demo Credentials */}
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-white text-sm">
-                        <h3 className="font-semibold mb-2">
-                            Demo Credentials:
-                        </h3>
-                        <div className="space-y-1">
-                            <p>
-                                <strong>Admin:</strong> admin@binadarma.ac.id /
-                                admin123
-                            </p>
-                            <p>
-                                <strong>User:</strong>{" "}
-                                john.doe@student.binadarma.ac.id / user123
-                            </p>
-                        </div>
                     </div>
                 </div>
             </div>

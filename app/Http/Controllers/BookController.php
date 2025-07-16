@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use App\Models\Category;
 
 class BookController extends Controller
 {
@@ -84,10 +85,12 @@ class BookController extends Controller
         $query->orderBy($sortBy, $sortOrder);
 
         $books = $query->paginate($request->get('per_page', 15));
+        $categories = Category::orderBy('name')->get(['id', 'name']);
 
         return Inertia::render('Admin/BooksManagement', [
             'books' => $books,
             'filters' => $request->only(['search', 'category']),
+            'categories' => $categories,
         ]);
     }
 

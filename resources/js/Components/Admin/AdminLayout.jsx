@@ -20,6 +20,12 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
             active: currentUrl.startsWith("/admin/books"),
         },
         {
+            name: "Manajemen Kategori",
+            href: "/admin/categories-management",
+            icon: "🏷️",
+            active: currentUrl.startsWith("/admin/categories-management"),
+        },
+        {
             name: "Approval Peminjaman",
             href: "/admin/borrowing-requests",
             icon: "📋",
@@ -100,17 +106,22 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
-                                    item.active
-                                        ? "bg-gradient-to-r from-[#6a1523] to-[#8a3837] text-white"
-                                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                }`}
+                                className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 relative overflow-hidden group
+                                    ${
+                                        item.active
+                                            ? "bg-gradient-to-r from-[#6a1523] to-[#8a3837] text-white shadow-lg scale-105"
+                                            : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                    }
+                                `}
                                 onClick={() => setSidebarOpen(false)}
                             >
-                                <span className="text-lg mr-3">
+                                <span className="text-lg mr-3 group-hover:scale-125 transition-transform duration-200">
                                     {item.icon}
                                 </span>
                                 {item.name}
+                                {item.active && (
+                                    <span className="absolute left-0 bottom-0 w-full h-1 bg-pink-400 rounded-t-lg animate-pulse"></span>
+                                )}
                             </Link>
                         ))}
                     </div>

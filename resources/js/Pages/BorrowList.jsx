@@ -26,7 +26,7 @@ export default function BorrowList({ borrowings, filters }) {
             pending: {
                 bg: "bg-yellow-100",
                 text: "text-yellow-800",
-                label: "Menunggu",
+                label: "Diajukan Peminjaman",
             },
             approved: {
                 bg: "bg-green-100",
@@ -140,7 +140,7 @@ export default function BorrowList({ borrowings, filters }) {
                                         : "bg-white/20 text-white hover:bg-white/30"
                                 }`}
                             >
-                                Menunggu
+                                Diajukan Peminjaman
                             </button>
                             <button
                                 onClick={() => handleFilterChange("approved")}
@@ -181,7 +181,7 @@ export default function BorrowList({ borrowings, filters }) {
                                     {stats.pending}
                                 </div>
                                 <div className="text-gray-600 font-medium text-sm">
-                                    Menunggu
+                                    Diajukan Peminjaman
                                 </div>
                             </div>
                             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 text-center">
