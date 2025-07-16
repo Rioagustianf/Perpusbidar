@@ -2,33 +2,12 @@ import BookCard from "./BookCard";
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Marquee from "react-fast-marquee";
 gsap.registerPlugin(ScrollTrigger);
 
 export default function RecommendationSection({ books = [], onBorrow }) {
     const displayBooks = books;
-    const gridRef = useRef(null);
     const sectionRef = useRef(null);
-
-    useEffect(() => {
-        if (gridRef.current && sectionRef.current) {
-            gsap.fromTo(
-                gridRef.current.children,
-                { opacity: 0, y: 40 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.7,
-                    stagger: 0.08,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: "top 80%",
-                        once: true,
-                    },
-                }
-            );
-        }
-    }, [displayBooks]);
 
     return (
         <section
@@ -63,30 +42,34 @@ export default function RecommendationSection({ books = [], onBorrow }) {
                         ></div>
                     </div>
                 </div>
-                {/* Books Grid */}
+                {/* Books Marquee */}
                 {displayBooks.length > 0 ? (
-                    <div
-                        ref={gridRef}
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                    <Marquee
+                        pauseOnHover={true}
+                        speed={40}
+                        gradient={false}
+                        className="gap-8"
                     >
                         {displayBooks.map((book) => (
-                            <BookCard
-                                key={book.id}
-                                book={{
-                                    ...book,
-                                    cover: book.image
-                                        ? book.image.startsWith("http")
-                                            ? book.image
-                                            : `/storage/${book.image}`
-                                        : "https://images.unsplash.com/photo-1589998059171-988d887df646?w=300&h=400&fit=crop",
-                                    rating: book.average_rating
-                                        ? Math.round(book.average_rating)
-                                        : 0,
-                                }}
-                                onBorrow={onBorrow}
-                            />
+                            <div className="mx-4 w-64 max-w-xs flex-shrink-0">
+                                <BookCard
+                                    key={book.id}
+                                    book={{
+                                        ...book,
+                                        cover: book.image
+                                            ? book.image.startsWith("http")
+                                                ? book.image
+                                                : `/storage/${book.image}`
+                                            : "https://images.unsplash.com/photo-1589998059171-988d887df646?w=300&h=400&fit=crop",
+                                        rating: book.average_rating
+                                            ? Math.round(book.average_rating)
+                                            : 0,
+                                    }}
+                                    onBorrow={onBorrow}
+                                />
+                            </div>
                         ))}
-                    </div>
+                    </Marquee>
                 ) : (
                     <div className="text-center text-white text-lg py-12">
                         Belum ada rekomendasi untuk Anda
