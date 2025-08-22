@@ -9,6 +9,8 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ExportController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TestController;
+use App\Http\Middleware\VerifyCsrfToken;
 
 // Dashboard - Landing Page
 Route::get('/', function () {
@@ -127,3 +129,7 @@ Route::middleware(['auth.custom', 'admin'])->prefix('admin')->group(function () 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::resource('categories', CategoryController::class)->except(['create', 'edit', 'show']);
 });
+
+// Test endpoint to trigger WhatsApp reminder (CSRF disabled for API testing)
+Route::post('/test/wa-reminder', [TestController::class, 'sendReminder'])
+    ->withoutMiddleware([VerifyCsrfToken::class]);

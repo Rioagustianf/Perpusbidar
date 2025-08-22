@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Support\PhoneNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -60,7 +61,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'nim' => $request->nim,
-            'phone' => $request->phone,
+            'phone' => PhoneNumber::normalizeToE164($request->phone),
             'password' => Hash::make($request->password),
             'role' => 'user', // Default role adalah user
         ]);
