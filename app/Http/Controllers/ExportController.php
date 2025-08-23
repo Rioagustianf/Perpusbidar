@@ -41,7 +41,7 @@ class ExportController extends Controller
 
         // Generate filename with timestamp
         $timestamp = Carbon::now()->format('Y-m-d_H-i-s');
-        $filename = "riwayat_peminjaman_{$timestamp}.xlsx";
+        $filename = "laporan_peminjaman_{$timestamp}.xlsx";
 
         try {
             return Excel::download(new BorrowingsExport($filters), $filename);

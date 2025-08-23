@@ -35,8 +35,14 @@ export default function ReturnBooks() {
         borrower_name: b.user?.name || "-",
         borrow_date: formatTanggalID(b.borrow_date),
         due_date: formatTanggalID(b.return_date),
-        status: b.status === "overdue" ? "terlambat" : "dipinjam",
+        status:
+            b.status === "overdue"
+                ? "terlambat"
+                : b.status === "return_requested"
+                ? "return_requested"
+                : "dipinjam",
         days_overdue: b.overdue_days || 0,
+        fine: b.calculated_fine || b.fine || 0,
         image: getImageUrl(b.book?.image),
     }));
 
@@ -89,9 +95,15 @@ export default function ReturnBooks() {
                     Terlambat {daysOverdue} hari
                 </span>
             );
+        } else if (status === "return_requested") {
+            return (
+                <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+                    Menunggu Konfirmasi
+                </span>
+            );
         }
         return (
-            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+            <span className="px-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                 Dipinjam
             </span>
         );
@@ -232,9 +244,9 @@ export default function ReturnBooks() {
                                     {filteredBooks.map((book) => (
                                         <div
                                             key={book.id}
-                                            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                                            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col"
                                         >
-                                            <div className="p-6">
+                                            <div className="p-6 flex-1 flex flex-col">
                                                 {/* Book Image */}
                                                 <div className="w-full h-32 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
                                                     <img
@@ -308,22 +320,43 @@ export default function ReturnBooks() {
                                                                 {book.due_date}
                                                             </span>
                                                         </div>
+                                                        {book.fine > 0 && (
+                                                            <div className="flex justify-between">
+                                                                <span>
+                                                                    Denda:
+                                                                </span>
+                                                                <span className="font-medium text-red-600">
+                                                                    Rp{" "}
+                                                                    {Math.floor(
+                                                                        book.fine
+                                                                    ).toLocaleString(
+                                                                        "id-ID"
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
 
                                                 {/* Action Button */}
-                                                {book.status === "dipinjam" && (
+                                                {book.status === "dipinjam" ||
+                                                book.status === "terlambat" ? (
                                                     <button
                                                         onClick={() =>
                                                             handleRequestReturn(
                                                                 book.id
                                                             )
                                                         }
-                                                        className="w-full bg-gradient-to-r from-[#6a1523] to-[#8a3837] text-white py-3 px-4 rounded-xl font-semibold hover:from-[#5a1220] hover:to-[#7a2837] transition-all duration-200 transform hover:scale-[1.02]"
+                                                        className="w-full bg-gradient-to-r from-[#6a1523] to-[#8a3837] text-white py-3 px-4 rounded-xl font-semibold hover:from-[#5a1220] hover:to-[#7a2837] transition-all duration-200 transform hover:scale-[1.02] mt-auto"
                                                     >
                                                         Ajukan Pengembalian
                                                     </button>
-                                                )}
+                                                ) : book.status ===
+                                                  "return_requested" ? (
+                                                    <div className="w-full bg-gray-400 text-white py-3 px-4 rounded-xl font-semibold text-center mt-auto cursor-not-allowed">
+                                                        Sudah Diajukan
+                                                    </div>
+                                                ) : null}
                                             </div>
                                         </div>
                                     ))}

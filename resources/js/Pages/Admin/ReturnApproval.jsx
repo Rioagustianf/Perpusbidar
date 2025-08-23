@@ -4,7 +4,7 @@ import AdminLayout from "../../Components/Admin/AdminLayout";
 import { router } from "@inertiajs/react";
 
 export default function ReturnApproval() {
-    const { requests = { data: [] } } = usePage().props;
+    const { requests = { data: [] }, stats = {} } = usePage().props;
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("all");
     const returnRequests = requests.data;
@@ -159,6 +159,8 @@ export default function ReturnApproval() {
         return new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
         }).format(amount);
     };
 
@@ -236,11 +238,7 @@ export default function ReturnApproval() {
                                     Menunggu Verifikasi
                                 </p>
                                 <p className="text-2xl font-bold text-yellow-600">
-                                    {
-                                        returnRequests.filter(
-                                            (req) => req.status === "pending"
-                                        ).length
-                                    }
+                                    {stats.pendingVerification || 0}
                                 </p>
                             </div>
                             <div className="text-3xl">⏳</div>
@@ -254,11 +252,7 @@ export default function ReturnApproval() {
                                     Dikembalikan Hari Ini
                                 </p>
                                 <p className="text-2xl font-bold text-green-600">
-                                    {
-                                        returnRequests.filter(
-                                            (req) => req.status === "approved"
-                                        ).length
-                                    }
+                                    {stats.returnedToday || 0}
                                 </p>
                             </div>
                             <div className="text-3xl">✅</div>
@@ -272,11 +266,7 @@ export default function ReturnApproval() {
                                     Terlambat
                                 </p>
                                 <p className="text-2xl font-bold text-red-600">
-                                    {
-                                        returnRequests.filter(
-                                            (req) => req.is_overdue
-                                        ).length
-                                    }
+                                    {stats.overdueCount || 0}
                                 </p>
                             </div>
                             <div className="text-3xl">⚠️</div>
@@ -290,13 +280,7 @@ export default function ReturnApproval() {
                                     Total Denda
                                 </p>
                                 <p className="text-lg font-bold text-orange-600">
-                                    {formatCurrency(
-                                        returnRequests.reduce(
-                                            (total, req) =>
-                                                total + req.fine_amount,
-                                            0
-                                        )
-                                    )}
+                                    {formatCurrency(stats.totalFines || 0)}
                                 </p>
                             </div>
                             <div className="text-3xl">💰</div>

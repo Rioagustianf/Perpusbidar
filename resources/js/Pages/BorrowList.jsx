@@ -302,11 +302,32 @@ export default function BorrowList({ borrowings, filters }) {
                                                                 </td>
                                                                 <td className="px-6 py-4">
                                                                     <div className="text-sm text-gray-900">
-                                                                        {borrowing.fine >
+                                                                        {borrowing.calculated_fine >
                                                                         0
-                                                                            ? `Rp ${borrowing.fine.toLocaleString()}`
+                                                                            ? `Rp ${Math.floor(
+                                                                                  borrowing.calculated_fine
+                                                                              ).toLocaleString(
+                                                                                  "id-ID"
+                                                                              )}`
+                                                                            : borrowing.fine >
+                                                                              0
+                                                                            ? `Rp ${Math.floor(
+                                                                                  borrowing.fine
+                                                                              ).toLocaleString(
+                                                                                  "id-ID"
+                                                                              )}`
                                                                             : "-"}
                                                                     </div>
+                                                                    {borrowing.overdue_days >
+                                                                        0 && (
+                                                                        <div className="text-xs text-red-600 mt-1">
+                                                                            Terlambat{" "}
+                                                                            {
+                                                                                borrowing.overdue_days
+                                                                            }{" "}
+                                                                            hari
+                                                                        </div>
+                                                                    )}
                                                                 </td>
                                                             </tr>
                                                             {borrowing.status ===

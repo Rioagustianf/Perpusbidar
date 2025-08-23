@@ -86,13 +86,11 @@ export default function Reports() {
                                         {b.borrow_date}
                                     </td>
                                     <td className="px-4 py-2">
-                                        {b.return_date || "-"}
+                                        {b.return_date}
                                     </td>
-                                    <td className="px-4 py-2 capitalize">
-                                        {b.status}
-                                    </td>
+                                    <td className="px-4 py-2">{b.status}</td>
                                     <td className="px-4 py-2">
-                                        {b.fine ? `Rp${b.fine}` : "-"}
+                                        {b.fine ? `Rp ${b.fine}` : "-"}
                                     </td>
                                 </tr>
                             ))

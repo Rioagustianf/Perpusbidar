@@ -11,3 +11,7 @@ Artisan::command('inspire', function () {
 // Schedule daily reminder at configurable time (default 07:00)
 $reminderTime = env('DUE_REMINDER_TIME', '07:00');
 Schedule::command('reminder:due-today')->dailyAt($reminderTime);
+
+// Schedule daily overdue marking and fine calculation (default 08:00)
+$overdueTime = env('OVERDUE_CHECK_TIME', '08:00');
+Schedule::command('borrowings:mark-overdue')->dailyAt($overdueTime);

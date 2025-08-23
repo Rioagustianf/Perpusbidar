@@ -29,6 +29,33 @@ class BorrowingController extends Controller
         $borrowings = $query->orderBy('created_at', 'desc')
                            ->paginate(10);
 
+        // Hitung denda dan hari keterlambatan untuk setiap peminjaman
+        $borrowings->getCollection()->transform(function ($borrowing) {
+            // Jika status approved dan sudah melewati tanggal jatuh tempo, hitung denda
+            if ($borrowing->status === 'approved' && $borrowing->return_date < Carbon::now()->toDateString()) {
+                $overdueDays = floor(Carbon::parse($borrowing->return_date)->diffInDays(Carbon::now(), false));
+                $calculatedFine = $overdueDays * 500; // Rp 500 per hari
+                
+                // Update denda di database jika belum ada
+                if ($borrowing->fine == 0) {
+                    $borrowing->update(['fine' => $calculatedFine]);
+                }
+                
+                $borrowing->overdue_days = (int) $overdueDays;
+                $borrowing->calculated_fine = (int) $calculatedFine;
+            } elseif ($borrowing->status === 'overdue') {
+                // Jika status sudah overdue, hitung ulang hari keterlambatan
+                $overdueDays = floor(Carbon::parse($borrowing->return_date)->diffInDays(Carbon::now(), false));
+                $borrowing->overdue_days = (int) $overdueDays;
+                $borrowing->calculated_fine = (int) $borrowing->fine;
+            } else {
+                $borrowing->overdue_days = 0;
+                $borrowing->calculated_fine = (int) $borrowing->fine;
+            }
+            
+            return $borrowing;
+        });
+
         return Inertia::render('BorrowList', [
             'borrowings' => $borrowings,
             'filters' => $request->only(['status']),
@@ -100,6 +127,33 @@ class BorrowingController extends Controller
                               ->orderBy('created_at', 'desc')
                               ->paginate(10);
 
+        // Hitung denda dan hari keterlambatan untuk setiap peminjaman
+        $borrowings->getCollection()->transform(function ($borrowing) {
+            // Jika status approved dan sudah melewati tanggal jatuh tempo, hitung denda
+            if ($borrowing->status === 'approved' && $borrowing->return_date < Carbon::now()->toDateString()) {
+                $overdueDays = floor(Carbon::parse($borrowing->return_date)->diffInDays(Carbon::now(), false));
+                $calculatedFine = $overdueDays * 500; // Rp 500 per hari
+                
+                // Update denda di database jika belum ada
+                if ($borrowing->fine == 0) {
+                    $borrowing->update(['fine' => $calculatedFine]);
+                }
+                
+                $borrowing->overdue_days = (int) $overdueDays;
+                $borrowing->calculated_fine = (int) $calculatedFine;
+            } elseif ($borrowing->status === 'overdue') {
+                // Jika status sudah overdue, hitung ulang hari keterlambatan
+                $overdueDays = floor(Carbon::parse($borrowing->return_date)->diffInDays(Carbon::now(), false));
+                $borrowing->overdue_days = (int) $overdueDays;
+                $borrowing->calculated_fine = (int) $borrowing->fine;
+            } else {
+                $borrowing->overdue_days = 0;
+                $borrowing->calculated_fine = (int) $borrowing->fine;
+            }
+            
+            return $borrowing;
+        });
+
         return Inertia::render('ReturnBooks', [
             'borrowings' => $borrowings,
         ]);
@@ -120,6 +174,22 @@ class BorrowingController extends Controller
 
         $borrowings->getCollection()->transform(function ($b) use ($ratedBookIds) {
             $b->has_rated = in_array($b->book_id, $ratedBookIds);
+            
+            // Hanya hitung hari keterlambatan tanpa mengubah denda yang sudah ada
+            if ($b->status === 'returned' && $b->actual_return_date) {
+                if ($b->actual_return_date > $b->return_date) {
+                    // Buku dikembalikan terlambat - hitung hari keterlambatan
+                    $b->overdue_days = (int) Carbon::parse($b->return_date)->diffInDays(Carbon::parse($b->actual_return_date));
+                } else {
+                    $b->overdue_days = 0;
+                }
+            } elseif ($b->status === 'overdue') {
+                // Hitung hari keterlambatan untuk buku yang sedang terlambat
+                $b->overdue_days = (int) floor(Carbon::parse($b->return_date)->diffInDays(Carbon::now(), false));
+            } else {
+                $b->overdue_days = 0;
+            }
+            
             return $b;
         });
 
@@ -165,7 +235,7 @@ class BorrowingController extends Controller
      */
     public function requestReturn(Borrowing $borrowing)
     {
-        if ($borrowing->user_id !== Auth::id() || $borrowing->status !== 'approved') {
+        if ($borrowing->user_id !== Auth::id() || !in_array($borrowing->status, ['approved', 'overdue'])) {
             return back()->with('error', 'Tidak dapat mengajukan pengembalian untuk peminjaman ini');
         }
         $borrowing->ajukanPengembalian();
@@ -182,8 +252,30 @@ class BorrowingController extends Controller
             ->orderBy('return_request_date', 'asc')
             ->paginate(15);
 
+        // Hitung stats untuk cards
+        $pendingVerification = Borrowing::where('status', 'return_requested')->count();
+        $returnedToday = Borrowing::where('status', 'returned')
+            ->whereDate('actual_return_date', Carbon::today())
+            ->count();
+        
+        // Hitung buku terlambat: yang masih overdue + yang sudah dikembalikan tapi terlambat
+        $overdueActive = Borrowing::where('status', 'overdue')->count();
+        $overdueReturned = Borrowing::where('status', 'returned')
+            ->where('fine', '>', 0)  // Ada denda = terlambat
+            ->count();
+        $overdueCount = $overdueActive + $overdueReturned;
+        
+        $totalFines = Borrowing::where('status', 'overdue')->sum('fine') + 
+                     Borrowing::where('status', 'returned')->where('fine', '>', 0)->sum('fine');
+
         return Inertia::render('Admin/ReturnApproval', [
             'requests' => $requests,
+            'stats' => [
+                'pendingVerification' => $pendingVerification,
+                'returnedToday' => $returnedToday,
+                'overdueCount' => $overdueCount,
+                'totalFines' => $totalFines,
+            ],
         ]);
     }
 
@@ -274,8 +366,19 @@ class BorrowingController extends Controller
         $pendingRequests = Borrowing::where('status', 'pending')->count();
         $overdueBooks = Borrowing::where('status', 'overdue')->count();
         $returnedToday = Borrowing::where('status', 'returned')
-            ->whereDate('updated_at', Carbon::today())
+            ->whereDate('actual_return_date', Carbon::today())
             ->count();
+        
+        // Hitung total denda dari semua peminjaman yang terlambat
+        $totalFines = Borrowing::where('status', 'overdue')
+            ->sum('fine');
+        
+        // Hitung total denda dari peminjaman yang sudah dikembalikan tapi terlambat
+        $returnedOverdueFines = Borrowing::where('status', 'returned')
+            ->where('fine', '>', 0)
+            ->sum('fine');
+        
+        $totalFinesAmount = $totalFines + $returnedOverdueFines;
 
         $recentActivities = Borrowing::with(['user', 'book'])
             ->orderByDesc('updated_at')
@@ -300,6 +403,7 @@ class BorrowingController extends Controller
                 'pendingRequests' => $pendingRequests,
                 'overdueBooks' => $overdueBooks,
                 'returnedToday' => $returnedToday,
+                'totalFines' => $totalFinesAmount,
             ],
             'recentActivities' => $recentActivities,
         ]);

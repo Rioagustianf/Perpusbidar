@@ -26,6 +26,9 @@ class BorrowingsExport implements FromCollection, WithHeadings, WithMapping, Wit
     {
         $query = Borrowing::with(['user', 'book']);
 
+        // Tidak mengekspor peminjaman yang ditolak
+        $query->where('status', '!=', 'rejected');
+
         // Apply filters
         if (isset($this->filters['status']) && $this->filters['status'] !== 'all') {
             $query->where('status', $this->filters['status']);
@@ -56,7 +59,7 @@ class BorrowingsExport implements FromCollection, WithHeadings, WithMapping, Wit
             'Tanggal Dikembalikan',
             'Status',
             'Kondisi Buku',
-            'Denda (Rp)',
+            'Denda',
             'Catatan',
             'Tanggal Pengajuan',
         ];
@@ -74,9 +77,17 @@ class BorrowingsExport implements FromCollection, WithHeadings, WithMapping, Wit
             $borrowing->borrow_date->format('d/m/Y'),
             $borrowing->return_date->format('d/m/Y'),
             $borrowing->actual_return_date ? $borrowing->actual_return_date->format('d/m/Y') : '-',
-            ucfirst($borrowing->status),
+            match($borrowing->status) {
+                'pending' => 'Diajukan',
+                'approved' => 'Disetujui',
+                'return_requested' => 'Menunggu Pengembalian',
+                'returned' => 'Dikembalikan',
+                'rejected' => 'Ditolak',
+                'overdue' => 'Terlambat',
+                default => ucfirst($borrowing->status)
+            },
             $borrowing->condition ?? '-',
-            number_format($borrowing->fine, 0, ',', '.'),
+            $borrowing->fine > 0 ? 'Rp ' . number_format($borrowing->fine, 0, ',', '.') : '-',
             $borrowing->notes ?? '-',
             $borrowing->created_at->format('d/m/Y H:i'),
         ];

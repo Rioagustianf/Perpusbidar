@@ -109,10 +109,18 @@ Route::middleware(['auth.custom', 'admin'])->prefix('admin')->group(function () 
                     'id' => $b->id,
                     'user_name' => $b->user->name ?? '-',
                     'book_title' => $b->book->title ?? '-',
-                    'borrow_date' => $b->borrow_date,
-                    'return_date' => $b->actual_return_date,
-                    'status' => $b->status,
-                    'fine' => $b->fine,
+                    'borrow_date' => $b->borrow_date ? \Carbon\Carbon::parse($b->borrow_date)->format('d M Y') : '-',
+                    'return_date' => $b->actual_return_date ? \Carbon\Carbon::parse($b->actual_return_date)->format('d M Y') : '-',
+                    'status' => match($b->status) {
+                        'pending' => 'Diajukan',
+                        'approved' => 'Disetujui',
+                        'return_requested' => 'Menunggu Pengembalian',
+                        'returned' => 'Dikembalikan',
+                        'rejected' => 'Ditolak',
+                        'overdue' => 'Terlambat',
+                        default => $b->status
+                    },
+                    'fine' => $b->fine ? number_format($b->fine, 0, ',', '.') : null,
                 ];
             });
         return Inertia::render('Admin/Reports', [

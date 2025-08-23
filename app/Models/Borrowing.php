@@ -95,7 +95,8 @@ class Borrowing extends Model
         $due = Carbon::parse($this->return_date);
         // Denda keterlambatan: 500 rupiah per hari keterlambatan
         if ($actualReturn->gt($due)) {
-            $overdueDays = $due->diffInDays($actualReturn);
+            // Gunakan diffInDays dengan false untuk menghitung hari penuh
+            $overdueDays = floor($due->diffInDays($actualReturn, false));
             $fine += 500 * $overdueDays;
         }
         // Denda kerusakan: 250.000 jika kondisi != 'baik'
@@ -122,12 +123,24 @@ class Borrowing extends Model
     public function returnBook($condition = 'baik')
     {
         $actualReturnDate = Carbon::now()->toDateString();
-        $fine = $this->calculateFine($actualReturnDate, $condition);
+        
+        // Jika sudah ada denda (overdue), gunakan denda yang sudah ada
+        // Hanya tambahkan denda kerusakan jika ada
+        $existingFine = $this->fine;
+        $damageFine = 0;
+        
+        // Denda kerusakan: 250.000 jika kondisi != 'baik'
+        if (strtolower($condition) !== 'baik') {
+            $damageFine = 250000;
+        }
+        
+        $totalFine = $existingFine + $damageFine;
+        
         $this->update([
             'status' => 'returned',
             'actual_return_date' => $actualReturnDate,
             'condition' => $condition,
-            'fine' => $fine,
+            'fine' => $totalFine,
         ]);
         $this->book->incrementStock();
     }

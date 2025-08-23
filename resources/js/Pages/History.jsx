@@ -20,24 +20,60 @@ export default function History() {
     const [notif, setNotif] = useState(null);
     const [notifType, setNotifType] = useState("success");
 
-    const historyData = borrowings.data.map((b) => ({
-        id: b.id,
-        title: b.book?.title || "-",
-        author: b.book?.author || "-",
-        borrow_date: b.borrow_date,
-        return_date: b.actual_return_date,
-        due_date: b.return_date,
-        status:
-            b.status === "overdue"
-                ? "terlambat"
-                : b.status === "returned"
-                ? "dikembalikan"
-                : "dipinjam",
-        days_late: b.overdue_days || 0,
-        image: getImageUrl(b.book?.image),
-        has_rated: b.has_rated,
-        book_id: b.book_id,
-    }));
+    // Helper function untuk format currency Rupiah
+    const formatCurrency = (amount) => {
+        if (!amount || amount === 0) return "-";
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(amount);
+    };
+
+    const historyData = borrowings.data.map((b) => {
+        // Gunakan data langsung dari database tanpa perhitungan ulang
+        const overdueDays = b.overdue_days || 0;
+        const backendFine = b.fine || 0;
+
+        // Breakdown denda berdasarkan kondisi yang sebenarnya
+        let overdueFine = 0;
+        let damageFine = 0;
+
+        // Jika ada keterlambatan, denda terlambat = hari × 500
+        if (overdueDays > 0) {
+            overdueFine = overdueDays * 500;
+        }
+
+        // Jika kondisi rusak, denda kerusakan = total - denda terlambat
+        if (b.condition && b.condition !== "baik" && backendFine > 0) {
+            damageFine = backendFine - overdueFine;
+        }
+
+        return {
+            id: b.id,
+            title: b.book?.title || "-",
+            author: b.book?.author || "-",
+            borrow_date: b.borrow_date,
+            return_date: b.actual_return_date,
+            due_date: b.return_date,
+            status:
+                b.status === "overdue"
+                    ? "terlambat"
+                    : b.status === "returned"
+                    ? "dikembalikan"
+                    : "dipinjam",
+            days_late: overdueDays,
+            fine: backendFine, // Total denda dari database
+            condition: b.condition || "-",
+            image: getImageUrl(b.book?.image),
+            has_rated: b.has_rated,
+            book_id: b.book_id,
+            // Breakdown denda yang akurat
+            overdue_fine: overdueFine,
+            damage_fine: damageFine,
+        };
+    });
 
     const filteredHistory = historyData.filter((item) => {
         const matchesSearch =
@@ -267,6 +303,18 @@ export default function History() {
                                                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                     Status
                                                 </th>
+                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Denda Terlambat
+                                                </th>
+                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Denda Kerusakan
+                                                </th>
+                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Total Denda
+                                                </th>
+                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Kondisi Buku
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-200">
@@ -349,6 +397,81 @@ export default function History() {
                                                         {getStatusBadge(
                                                             item.status,
                                                             item.days_late
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        {item.overdue_fine >
+                                                        0 ? (
+                                                            <span className="text-red-600 font-medium">
+                                                                {formatCurrency(
+                                                                    item.overdue_fine
+                                                                )}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-gray-400">
+                                                                -
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        {item.damage_fine >
+                                                        0 ? (
+                                                            <span className="text-orange-600 font-medium">
+                                                                {formatCurrency(
+                                                                    item.damage_fine
+                                                                )}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-gray-400">
+                                                                -
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                        {item.fine > 0 ? (
+                                                            <span className="text-red-700 font-bold">
+                                                                {formatCurrency(
+                                                                    item.fine
+                                                                )}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-gray-400">
+                                                                -
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        {item.status ===
+                                                        "dikembalikan" ? (
+                                                            <span
+                                                                className={`px-2 py-1 rounded text-xs font-medium ${
+                                                                    item.condition ===
+                                                                    "baik"
+                                                                        ? "bg-green-100 text-green-800"
+                                                                        : item.condition ===
+                                                                          "rusak_ringan"
+                                                                        ? "bg-yellow-100 text-yellow-800"
+                                                                        : item.condition ===
+                                                                          "rusak_berat"
+                                                                        ? "bg-red-100 text-red-800"
+                                                                        : "bg-gray-100 text-gray-800"
+                                                                }`}
+                                                            >
+                                                                {item.condition ===
+                                                                "baik"
+                                                                    ? "Baik"
+                                                                    : item.condition ===
+                                                                      "rusak_ringan"
+                                                                    ? "Rusak Ringan"
+                                                                    : item.condition ===
+                                                                      "rusak_berat"
+                                                                    ? "Rusak Berat"
+                                                                    : item.condition}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-gray-400">
+                                                                -
+                                                            </span>
                                                         )}
                                                     </td>
                                                 </tr>
