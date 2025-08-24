@@ -70,6 +70,33 @@ class TestController extends Controller
 
         return response()->json(['ok' => true, 'borrowing_id' => $borrowingId]);
     }
+
+    public function sendDailyOverdueReminder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'borrowing_id' => 'nullable|integer|exists:borrowings,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['ok' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $borrowingId = $request->integer('borrowing_id');
+
+        if (!$borrowingId) {
+            // Cari borrowing yang sudah overdue
+            $overdueBorrowing = Borrowing::where('status', 'overdue')->first();
+            if (!$overdueBorrowing) {
+                return response()->json(['ok' => false, 'message' => 'No overdue borrowings found'], 400);
+            }
+            $borrowingId = $overdueBorrowing->id;
+        }
+
+        // Run job synchronously for immediate feedback
+        dispatch_sync(new SendWhatsAppReminderJob($borrowingId, 'daily_overdue'));
+
+        return response()->json(['ok' => true, 'borrowing_id' => $borrowingId]);
+    }
 }
 
 
