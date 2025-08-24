@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TestController;
 use App\Http\Middleware\VerifyCsrfToken;
+use App\Http\Controllers\AdminUserController;
 
 // Dashboard - Landing Page
 Route::get('/', function () {
@@ -87,16 +88,9 @@ Route::middleware(['auth.custom', 'admin'])->prefix('admin')->group(function () 
     Route::post('/borrowings/{borrowing}/return', [BorrowingController::class, 'returnBook'])->name('admin.borrowings.return');
 
     // Users Management
-    Route::get('/users', function () {
-        $users = \App\Models\User::select('id', 'name', 'nim', 'email', 'role')
-            ->orderBy('name')
-            ->paginate(20);
-        $roles = ['admin', 'user'];
-        return Inertia::render('Admin/UsersManagement', [
-            'users' => $users,
-            'roles' => $roles,
-        ]);
-    })->name('admin.users');
+    Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users');
+    Route::patch('/users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 
     // Reports & Export
     Route::get('/reports', function () {

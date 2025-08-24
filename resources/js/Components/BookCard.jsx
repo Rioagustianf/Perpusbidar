@@ -14,7 +14,7 @@ export default function BookCard({ book, onBorrow }) {
 
     return (
         <div
-            className="bg-transparent rounded-lg shadow-lg overflow-visible hover:shadow-2xl h-full flex flex-col group-hover:-translate-y-2 group-hover:scale-105 group-hover:z-10 transition-all duration-300 cursor-pointer hover:bg-[#f5e7d6]/60"
+            className="bg-transparent rounded-lg shadow-lg overflow-visible h-full flex flex-col cursor-pointer transition-all duration-300 ease-out transform hover:-translate-y-4 hover:shadow-2xl hover:shadow-blue-500/20 hover:z-10"
             onClick={() => onBorrow && onBorrow(book)}
         >
             <div className="relative">

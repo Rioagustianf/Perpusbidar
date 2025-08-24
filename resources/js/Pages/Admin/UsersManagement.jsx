@@ -12,23 +12,54 @@ export default function UsersManagement() {
     const [editData, setEditData] = useState({
         name: "",
         email: "",
+        phone: "",
         role: "user",
     });
     const [notification, setNotification] = useState(null);
     const [notificationType, setNotificationType] = useState("success");
 
+    // Helper function to format phone number for display
+    const formatPhoneForDisplay = (phone) => {
+        if (!phone) return "-";
+
+        // If already in +62 format, convert to 08 format for display
+        if (phone.startsWith("+62")) {
+            return "0" + phone.substring(3);
+        }
+
+        return phone;
+    };
+
+    // Helper function to format phone number for input (remove +62 if present)
+    const formatPhoneForInput = (phone) => {
+        if (!phone) return "";
+
+        // If in +62 format, convert to 08 format for input
+        if (phone.startsWith("+62")) {
+            return "0" + phone.substring(3);
+        }
+
+        return phone;
+    };
+
     const filteredUsers = users.data.filter((u) => {
         const matchesSearch =
             u.name.toLowerCase().includes(search.toLowerCase()) ||
             u.nim?.toLowerCase().includes(search.toLowerCase()) ||
-            u.email.toLowerCase().includes(search.toLowerCase());
+            u.email.toLowerCase().includes(search.toLowerCase()) ||
+            u.phone?.toLowerCase().includes(search.toLowerCase());
         const matchesRole = roleFilter === "all" || u.role === roleFilter;
         return matchesSearch && matchesRole;
     });
 
     const handleEdit = (user) => {
         setSelectedUser(user);
-        setEditData({ name: user.name, email: user.email, role: user.role });
+        setEditData({
+            name: user.name,
+            email: user.email,
+            phone: formatPhoneForInput(user.phone),
+            role: user.role,
+        });
         setEditModal(true);
     };
 
@@ -84,7 +115,7 @@ export default function UsersManagement() {
             <div className="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
                 <input
                     type="text"
-                    placeholder="Cari nama, NIM, email..."
+                    placeholder="Cari nama, NIM, email, telepon..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="px-4 py-2 rounded border border-gray-300 w-full md:w-72"
@@ -109,6 +140,7 @@ export default function UsersManagement() {
                             <th className="px-4 py-2 text-left">Nama</th>
                             <th className="px-4 py-2 text-left">NIM</th>
                             <th className="px-4 py-2 text-left">Email</th>
+                            <th className="px-4 py-2 text-left">Telepon</th>
                             <th className="px-4 py-2 text-left">Role</th>
                             <th className="px-4 py-2 text-left">Aksi</th>
                         </tr>
@@ -117,7 +149,7 @@ export default function UsersManagement() {
                         {filteredUsers.length === 0 ? (
                             <tr>
                                 <td
-                                    colSpan={5}
+                                    colSpan={6}
                                     className="text-center py-8 text-gray-500"
                                 >
                                     Tidak ada user ditemukan
@@ -131,6 +163,9 @@ export default function UsersManagement() {
                                         {u.nim || "-"}
                                     </td>
                                     <td className="px-4 py-2">{u.email}</td>
+                                    <td className="px-4 py-2">
+                                        {formatPhoneForDisplay(u.phone)}
+                                    </td>
                                     <td className="px-4 py-2 capitalize">
                                         {u.role}
                                     </td>
@@ -218,6 +253,23 @@ export default function UsersManagement() {
                                         email: e.target.value,
                                     })
                                 }
+                                className="w-full px-4 py-2 rounded border border-gray-300"
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="block mb-1 font-medium">
+                                Nomor Telepon
+                            </label>
+                            <input
+                                type="tel"
+                                value={editData.phone}
+                                onChange={(e) =>
+                                    setEditData({
+                                        ...editData,
+                                        phone: e.target.value,
+                                    })
+                                }
+                                placeholder="Contoh: 08123456789"
                                 className="w-full px-4 py-2 rounded border border-gray-300"
                             />
                         </div>
