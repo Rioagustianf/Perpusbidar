@@ -124,22 +124,16 @@ export default function ReturnApproval() {
 
     const getConditionBadge = (condition) => {
         switch (condition) {
-            case "good":
+            case "baik":
                 return (
                     <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
                         Baik
                     </span>
                 );
-            case "damaged":
+            case "rusak":
                 return (
                     <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-medium">
                         Rusak
-                    </span>
-                );
-            case "lost":
-                return (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs font-medium">
-                        Hilang
                     </span>
                 );
             default:
@@ -197,8 +191,7 @@ export default function ReturnApproval() {
                             className="w-full px-4 py-2 rounded border border-gray-300 mb-4"
                         >
                             <option value="baik">Baik</option>
-                            <option value="rusak_ringan">Rusak Ringan</option>
-                            <option value="rusak_berat">Rusak Berat</option>
+                            <option value="rusak">Rusak</option>
                         </select>
                         <div className="flex justify-end space-x-2">
                             <button
@@ -481,7 +474,7 @@ export default function ReturnApproval() {
                                                 )}
 
                                                 {request.condition ===
-                                                    "damaged" && (
+                                                    "rusak" && (
                                                     <div className="mt-3 p-3 bg-red-50 rounded-lg">
                                                         <p className="text-sm text-red-700">
                                                             <span className="font-medium">

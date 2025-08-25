@@ -343,7 +343,7 @@ class BorrowingController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'condition' => 'required|string|in:baik,rusak_ringan,rusak_berat',
+            'condition' => 'required|string|in:baik,rusak',
         ]);
 
         if ($validator->fails()) {
